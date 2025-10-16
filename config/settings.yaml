@@ -1,0 +1,46 @@
+# RAG Configuration
+
+# Document Processing
+document:
+  chunk_size: 1000
+  chunk_overlap: 200
+  supported_formats:
+    - .pdf
+    - .txt
+    - .docx
+
+# Embeddings
+embeddings:
+  model: "all-MiniLM-L6-v2"
+  dimension: 384
+
+# Vector Store
+vectorstore:
+  provider: chromadb
+  persist_directory: "./db/chroma"
+  collection_name: "documents"
+
+# Retrieval
+retrieval:
+  top_k: 3
+  score_threshold: 0.0
+
+# LLM Configuration
+llm:
+  provider: auto  # auto, ollama, openai
+  
+  ollama:
+    model: "tinyllama"
+    base_url: "http://localhost:11434"
+    temperature: 0.7
+    
+  openai:
+    model: "gpt-4o-mini"
+    temperature: 0.7
+    use_if_available: true
+
+# Paths
+paths:
+  data_raw: "./data/raw"
+  data_indexed: "./data/indexed"
+  db: "./db/chroma"

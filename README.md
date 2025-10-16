@@ -1,167 +1,161 @@
-# Plano de Estudos: RAG Avançado em 4 Semanas
+# RAG System - Retrieval Augmented Generation
 
-## Objetivo
+Complete RAG (Retrieval-Augmented Generation) system with modular architecture, supporting multiple LLM providers.
 
-Revisar e validar seu domínio prático dos conceitos de RAG avançado em 4 semanas, com ênfase em:
+## Features
 
-- Arquitetura de RAG híbrido (semântico + keyword)
-- LlamaIndex para orquestração
-- Qdrant e vetorização eficiente
-- Reranking, query expansion e avaliação (RAGAS, TruLens)
+- Document processing (PDF, TXT)
+- Vector storage with ChromaDB
+- Semantic search with sentence-transformers
+- Multiple LLM support (Ollama, OpenAI)
+- CLI and programmatic interfaces
+- Dev Container ready
 
----
+## Quick Start
 
-## Estrutura do Programa
+### Using DevContainer (Recommended)
 
-### Semana 1 — Fundamentos e Implementação Base de RAG
+1. Open in VS Code with Dev Containers extension
+2. Wait for automatic setup (downloads tinyllama model)
+3. Start using:
 
-**Objetivo:** Garantir domínio sobre o pipeline RAG completo.
+```bash
+python cli.py stats
+python cli.py chat
+```
 
-#### Conceitos
+### Manual Setup
 
-- O que é Retrieval-Augmented Generation e por que é usado
-- Diferença entre retrieval semântico, keyword e híbrido
-- Estrutura geral: Document Loader → Splitter → Embedding → Vector Store → Retriever → LLM → Response Synthesizer
+```bash
+# Install dependencies
+pip install -e .
 
-#### Prática
+# Install and start Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+ollama serve &
+ollama pull tinyllama
 
-1. Implementar um RAG básico em Python:
-   - Use `LlamaIndex` com `OpenAI embeddings (text-embedding-3)` e um retriever simples
-   - Fonte: [LlamaIndex Getting Started Guide](https://docs.llamaindex.ai/)
-2. Testar chunking com diferentes tamanhos e comparar qualidade de resposta
+# Index documents
+python scripts/index.py --create-sample
+# or
+python scripts/index.py --dir data/raw
 
-#### Autoavaliação
+# Use CLI
+python cli.py chat
+```
 
-- Consigo explicar cada componente do pipeline RAG?
-- Entendo o que são embeddings e como o tamanho do chunk afeta o contexto?
+## CLI Commands
 
----
+```bash
+# Index documents
+python cli.py index --dir data/raw
+python cli.py index --file document.pdf
 
-### Semana 2 — Retrieval Híbrido e Reranking
+# Search (retrieval only)
+python cli.py search "your query"
 
-**Objetivo:** Dominar a parte de precisão e relevância na recuperação.
+# Query (retrieval + generation)
+python cli.py query "What is RAG?" --show-context
 
-#### Conceitos
+# Interactive chat
+python cli.py chat
 
-- Retrieval híbrido (BM25 + semântico): como combinar pontuações
-- Reranking e fusion retrieval (re-ranqueamento pós-busca)
-- Introdução a query expansion e query rewriting
+# Statistics
+python cli.py stats
+```
 
-#### Prática
+## Configuration
 
-1. Implementar um retriever híbrido com:
-   - `BM25` (usando `rank_bm25` ou `Elasticsearch`)
-   - Embeddings (usando `Qdrant` ou `FAISS`)
-   - Combinar resultados (fusion score ou interleaving)
-2. Aplicar reranking com `cross-encoder` (modelo do Hugging Face: `cross-encoder/ms-marco-MiniLM-L-6-v2`)
+Edit `config/settings.yaml` to customize:
 
-#### Autoavaliação
+- Model selection (tinyllama, llama2, qwen2.5:0.5b)
+- Chunk size and overlap
+- Top-k retrieval
+- Vector store settings
 
-- Sei ajustar o peso relativo entre BM25 e embeddings?
-- Consigo medir o impacto de reranking nos resultados?
+## LLM Providers
 
----
+### Ollama (Default)
 
-### Semana 3 — LlamaIndex Avançado e Qdrant
+```bash
+# Models by memory requirement:
+# - qwen2.5:0.5b (352MB, 800MB RAM)
+# - tinyllama (637MB, 1.1GB RAM)
+# - llama2 (3.8GB, 6GB RAM)
 
-**Objetivo:** Consolidar a parte de infraestrutura e otimização.
+ollama pull tinyllama
+```
 
-#### Conceitos
+### OpenAI
 
-- Hierarchical retrieval (retrieval em múltiplos níveis de contexto)
-- Memory e context management no LlamaIndex
-- Query planning e composition graphs
-- Fundamentos de vector databases (Qdrant, Pinecone, Milvus)
+Create `.env`:
+```
+OPENAI_API_KEY=your_key_here
+```
 
-#### Prática
+Set in `config/settings.yaml`:
+```yaml
+llm:
+  openai:
+    use_if_available: true
+```
 
-1. Criar um pipeline com:
-   - `LlamaIndex` + `Qdrant` como vector store
-   - Implementar hierarchical retrieval com dois níveis de contexto
-2. Explorar parâmetros do Qdrant (`cosine`, `dot`, `euclidean`) e otimizar a similaridade
+Or use CLI:
+```bash
+python cli.py query "question" --llm openai
+```
 
-#### Autoavaliação
+## Programmatic Usage
 
-- Sei explicar como o Qdrant armazena e busca embeddings?
-- Sei configurar um retriever com múltiplos contextos e níveis hierárquicos?
+```python
+from src.utils.config import load_config
+from src.rag.chain import RAGChain
 
----
+config = load_config()
+rag = RAGChain(config)
 
-### Semana 4 — Avaliação, Métricas e Projeto Final
+result = rag.query("What is RAG?")
+print(result['answer'])
+```
 
-**Objetivo:** Validar resultados e consolidar aprendizado prático.
+## Project Structure
 
-#### Conceitos
+```
+RAG-Experiments/
+├── config/              # Configuration
+├── data/
+│   ├── raw/            # Original documents
+│   └── indexed/        # Indexing metadata
+├── db/chroma/          # Vector database
+├── src/
+│   ├── core/           # Core components
+│   ├── processing/     # Document processing
+│   ├── rag/            # RAG logic
+│   └── utils/          # Utilities
+├── scripts/            # Helper scripts
+├── cli.py              # CLI interface
+└── setup.py            # Package setup
+```
 
-- Avaliação de sistemas RAG: Precision@K, Recall@K, Context Relevance
-- Ferramentas: RAGAS e TruLens
+## Development
 
-#### Prática
+```bash
+# Install in development mode
+pip install -e ".[dev]"
 
-1. Rodar uma avaliação com `RAGAS` em um pequeno dataset (por exemplo, perguntas sobre jogos)
-2. Analisar métricas e ajustar:
-   - Chunk size
-   - Número de documentos recuperados (K)
-   - Balanceamento semântico vs keyword
-3. Criar um mini-projeto:
-   - "FAQ Bot para jogos" usando `LlamaIndex + Qdrant + OpenAI API`
-   - Adicionar reranking e query expansion
+# Format code
+black .
 
-#### Autoavaliação
+# Run tests
+pytest
+```
 
-- Sei medir a qualidade do meu RAG?
-- Sei justificar ajustes técnicos com base em métricas?
-
----
-
-## Recursos Recomendados
-
-| Tema | Recurso |
-|------|---------|
-| Conceitos RAG | [Understanding RAG Systems (LlamaIndex)](https://docs.llamaindex.ai/) |
-| Retrieval híbrido | [Dense vs Sparse Retrieval Explained (Pinecone)](https://www.pinecone.io/learn/) |
-| Reranking | [Hugging Face Cross-Encoder Models](https://huggingface.co/cross-encoder) |
-| LlamaIndex Avançado | [LlamaIndex Advanced Retrieval Cookbook](https://docs.llamaindex.ai/en/stable/examples/) |
-| Qdrant | [Qdrant Docs — Tutorials](https://qdrant.tech/documentation/) |
-| Avaliação RAG | [RAGAS GitHub](https://github.com/explodinggradients/ragas) / [TruLens.ai](https://www.trulens.org/) |
-
----
-
-## Pré-requisitos
+## Requirements
 
 - Python 3.8+
-- Conhecimento básico de Machine Learning e NLP
-- API Key da OpenAI (para embeddings e LLM)
-- Familiaridade com conceitos de embeddings e similaridade vetorial
+- 2GB RAM minimum (for tinyllama)
+- 6GB RAM for llama2
 
----
+## License
 
-## Como Usar Este Guia
-
-1. Dedique pelo menos 5-10 horas por semana ao estudo
-2. Siga a ordem das semanas para construir conhecimento progressivo
-3. Complete as práticas antes de avançar para a próxima semana
-4. Use as autoavaliações para identificar pontos fracos
-5. Mantenha um repositório Git com seus experimentos
-
----
-
-## Resultados Esperados
-
-Ao final das 4 semanas, você será capaz de:
-
-- Implementar um sistema RAG completo do zero
-- Combinar múltiplas estratégias de retrieval
-- Avaliar e otimizar performance de sistemas RAG
-- Integrar componentes avançados como reranking e query expansion
-- Tomar decisões arquiteturais baseadas em métricas
-
----
-
-## Licença
-
-Este material é de código aberto para fins educacionais.
-
-## Contribuições
-
-Sinta-se livre para adicionar recursos, exemplos de código ou melhorias ao plano de estudos.
+Open source for educational purposes.

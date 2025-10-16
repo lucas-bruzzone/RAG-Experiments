@@ -24,7 +24,7 @@
     }
   },
 
-  "forwardPorts": [8888, 8000, 8501],
+  "forwardPorts": [8888, 8000, 8501, 11434],
   "portsAttributes": {
     "8888": {
       "label": "Jupyter",
@@ -37,10 +37,14 @@
     "8501": {
       "label": "Streamlit",
       "onAutoForward": "notify"
+    },
+    "11434": {
+      "label": "Ollama",
+      "onAutoForward": "silent"
     }
   },
 
-  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt && bash .devcontainer/setup_ollama.sh",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
 
   "remoteUser": "vscode",
   
