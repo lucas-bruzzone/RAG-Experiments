@@ -22,7 +22,7 @@ sleep 5
 # Download small model
 echo -e "\n[4/4] Downloading tinyllama model (~637MB)..."
 echo "This may take a few minutes..."
-ollama pull tinyllama
+ollama pull qwen2.5:0.5b
 
 # Index sample document
 echo -e "\nCreating and indexing sample document..."
