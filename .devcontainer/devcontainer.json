@@ -46,6 +46,6 @@
 
   "postCreateCommand": "bash .devcontainer/setup.sh",
 
-  "remoteUser": "vscode",
+  "remoteUser": "vscode"
   
 }
