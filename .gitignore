@@ -1,9 +1,56 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environments
 .env
-db/
-.vscode/
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Poetry
+poetry.lock
+.poetry/
+
+# Distribution / packaging
+.eggs/
 *.egg-info/
 dist/
 build/
+wheels/
+
+# Database
+db/
+*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+data/raw/*.pdf
+data/raw/*.txt
+data/indexed/

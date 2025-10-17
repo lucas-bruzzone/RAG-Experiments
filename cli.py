@@ -9,7 +9,10 @@ from src.processing.document import DocumentProcessor
 from src.rag.chain import RAGChain
 from src.rag.retriever import Retriever
 from src.utils.config import load_config
+from src.utils import setup_logging, get_logger
 from src.telemetry import PhoenixTelemetry
+
+logger = get_logger(__name__)
 
 
 def cmd_index(args):
@@ -18,6 +21,7 @@ def cmd_index(args):
     processor = DocumentProcessor(config)
 
     if args.reset:
+        logger.info("Resetting collection")
         processor.vectorstore.reset()
         print("Collection reset")
 
@@ -43,6 +47,7 @@ def cmd_search(args):
     config = load_config()
     retriever = Retriever(config)
 
+    logger.info(f"Searching for: {args.query}")
     results = retriever.retrieve(args.query, top_k=args.top_k)
 
     print(f"\nQuery: {args.query}")
@@ -96,6 +101,11 @@ def main():
     parser = argparse.ArgumentParser(description="RAG CLI")
     parser.add_argument("--telemetry", action="store_true",
                         help="Enable Phoenix telemetry UI")
+    parser.add_argument("--log-level", default="INFO",
+                        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+                        help="Set logging level")
+    parser.add_argument("--verbose", "-v", action="store_true",
+                        help="Enable verbose output (DEBUG level)")
 
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
@@ -129,6 +139,10 @@ def main():
 
     args = parser.parse_args()
 
+    # Setup logging FIRST
+    setup_logging(level=args.log_level, verbose=args.verbose)
+    logger.info(f"Starting CLI command: {args.command or 'none'}")
+
     if not args.command:
         parser.print_help()
         return
@@ -143,9 +157,12 @@ def main():
 
     try:
         commands[args.command](args)
+        logger.info(f"Command '{args.command}' completed successfully")
     except KeyboardInterrupt:
+        logger.info("Command interrupted by user")
         print("\nInterrupted")
     except Exception as e:
+        logger.error(f"Command failed: {e}", exc_info=True)
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
     finally:

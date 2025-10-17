@@ -4,31 +4,30 @@ Complete RAG (Retrieval-Augmented Generation) system with modular architecture, 
 
 ## Features
 
-- Document processing (PDF, TXT)
+- Document processing (PDF, TXT, DOCX)
 - Vector storage with ChromaDB
 - Semantic search with sentence-transformers
 - Multiple LLM support (Ollama, OpenAI)
+- Structured logging with correlation IDs
 - CLI and programmatic interfaces
 - Dev Container ready
 
 ## Quick Start
 
-### Using DevContainer (Recommended)
-
-1. Open in VS Code with Dev Containers extension
-2. Wait for automatic setup (downloads tinyllama model)
-3. Start using:
+### Using Poetry (Recommended)
 
 ```bash
-python cli.py stats
-python cli.py chat
-```
+# Install Poetry
+curl -sSL https://install.python-poetry.org | python3 -
 
-### Manual Setup
-
-```bash
 # Install dependencies
-pip install -e .
+poetry install
+
+# Optional: Install telemetry extras
+poetry install --extras telemetry
+
+# Activate virtual environment
+poetry shell
 
 # Install and start Ollama
 curl -fsSL https://ollama.ai/install.sh | sh
@@ -41,6 +40,26 @@ python scripts/index.py --create-sample
 python scripts/index.py --dir data/raw
 
 # Use CLI
+python cli.py chat
+```
+
+### Using pip (Alternative)
+
+```bash
+# Install dependencies
+pip install -e .
+
+# Rest is the same as Poetry method
+```
+
+### Using DevContainer
+
+1. Open in VS Code with Dev Containers extension
+2. Wait for automatic setup (downloads tinyllama model)
+3. Start using:
+
+```bash
+python cli.py stats
 python cli.py chat
 ```
 
@@ -62,6 +81,10 @@ python cli.py chat
 
 # Statistics
 python cli.py stats
+
+# Enable verbose logging
+python cli.py --verbose query "What is RAG?"
+python cli.py --log-level DEBUG chat
 ```
 
 ## Configuration
@@ -72,6 +95,7 @@ Edit `config/settings.yaml` to customize:
 - Chunk size and overlap
 - Top-k retrieval
 - Vector store settings
+- Logging levels
 
 ## LLM Providers
 
@@ -134,25 +158,47 @@ RAG-Experiments/
 │   └── utils/          # Utilities
 ├── scripts/            # Helper scripts
 ├── cli.py              # CLI interface
-└── setup.py            # Package setup
+└── pyproject.toml      # Dependencies (Poetry)
 ```
 
 ## Development
 
 ```bash
-# Install in development mode
-pip install -e ".[dev]"
+# Install with dev dependencies
+poetry install --with dev
 
 # Format code
-black .
+poetry run black .
 
-# Run tests
-pytest
+# Run tests (when available)
+poetry run pytest
+
+# Add new dependency
+poetry add package-name
+
+# Add dev dependency
+poetry add --group dev package-name
+```
+
+## Logging
+
+The system includes structured logging:
+
+```python
+# Logs include:
+# - Timestamp
+# - Module name
+# - Log level
+# - Correlation ID (for tracking queries)
+# - Contextual data
+
+# Example log:
+# 2025-01-15 10:30:45 - src.rag.chain - INFO - [a1b2c3d4] - Processing query: 'What is RAG?'
 ```
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.9+
 - 2GB RAM minimum (for tinyllama)
 - 6GB RAM for llama2
 

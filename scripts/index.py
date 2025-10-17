@@ -10,6 +10,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.processing.document import DocumentProcessor
 from src.utils.config import load_config
+from src.utils import setup_logging, get_logger
+
+logger = get_logger(__name__)
 
 
 def create_sample_document():
@@ -40,6 +43,8 @@ Models like sentence-transformers generate high-quality embeddings."""
     sample_file = Path("data/raw/sample_document.txt")
     sample_file.parent.mkdir(parents=True, exist_ok=True)
     sample_file.write_text(sample_content, encoding="utf-8")
+    
+    logger.info(f"Created sample document: {sample_file}")
     print(f"Created sample document: {sample_file}")
     return str(sample_file)
 
@@ -52,8 +57,17 @@ def main():
                        help="Create and index sample document")
     parser.add_argument("--reset", action="store_true", 
                        help="Reset collection before indexing")
+    parser.add_argument("--log-level", default="INFO",
+                       choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+                       help="Set logging level")
+    parser.add_argument("--verbose", "-v", action="store_true",
+                       help="Enable verbose output")
     
     args = parser.parse_args()
+    
+    # Setup logging
+    setup_logging(level=args.log_level, verbose=args.verbose)
+    logger.info("Starting indexing script")
     
     if not any([args.file, args.dir, args.create_sample]):
         parser.print_help()
@@ -65,6 +79,7 @@ def main():
     
     # Reset if requested
     if args.reset:
+        logger.info("Resetting collection")
         print("Resetting collection...")
         processor.vectorstore.reset()
     
@@ -89,6 +104,14 @@ def main():
     print(f"Total chunks: {stats['total_chunks']}")
     print(f"Database: {stats['persist_directory']}")
     print("=" * 60)
+    
+    logger.info(
+        "Indexing completed",
+        extra={
+            'total_chunks': total_chunks,
+            'collection': stats['name']
+        }
+    )
 
 
 if __name__ == "__main__":
