@@ -3,9 +3,7 @@
 import os
 
 try:
-    import phoenix as px
     from phoenix.otel import register
-    from openinference.instrumentation.langchain import LangChainInstrumentor
     PHOENIX_AVAILABLE = True
 except ImportError:
     PHOENIX_AVAILABLE = False
