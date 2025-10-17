@@ -1,7 +1,6 @@
 {
   "name": "RAG Development",
   "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
-  
   "customizations": {
     "vscode": {
       "extensions": [
@@ -23,8 +22,12 @@
       }
     }
   },
-
-  "forwardPorts": [8888, 8000, 8501, 11434],
+  "forwardPorts": [
+    8888,
+    8000,
+    8501,
+    11434
+  ],
   "portsAttributes": {
     "8888": {
       "label": "Jupyter",
@@ -43,9 +46,12 @@
       "onAutoForward": "silent"
     }
   },
-
-  "postCreateCommand": "bash .devcontainer/setup.sh",
-
-  "remoteUser": "vscode"
-  
+  "postCreateCommand": "sed -i 's/\\r$//' .devcontainer/setup.sh && bash .devcontainer/setup.sh",
+  "remoteUser": "vscode",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true
+    }
+  }
 }

@@ -3,7 +3,7 @@ langchain==0.1.0
 langchain-community==0.0.10
 
 # Vector Store
-chromadb==0.4.22
+chromadb==0.4.24
 pysqlite3-binary==0.5.2.post1
 
 # Embeddings
@@ -19,6 +19,10 @@ pyyaml==6.0.1
 # Utilities
 python-dotenv==1.0.1
 tiktoken==0.5.2
+
+# Telemetry
+arize-phoenix[evals]>=4.0.0
+openinference-instrumentation-langchain>=0.1.19
 
 # Development
 jupyter==1.0.0
